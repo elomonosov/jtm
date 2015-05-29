@@ -1,22 +1,22 @@
 package ru.elomonosov.entity;
 
+import ru.elomonosov.datatype.DataType;
+
 /**
  * Created by n dd on 24.05.2015.
  */
-public class Attribute {
+public final class Attribute<E extends DataType> {
 
     private int id;
 
     private Type type;
 
-    public enum AttributeType {STRING, INTEGER, DATE, LINK}
-
-    private AttributeType AttributeType;
+    private E DataType;
 
     private String name;
 
-    public AttributeType getAttributeType() {
-        return AttributeType;
+    public DataType getDataType() {
+        return DataType;
     }
 
     public int getId() {

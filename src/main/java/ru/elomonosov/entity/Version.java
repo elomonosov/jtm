@@ -1,20 +1,42 @@
 package ru.elomonosov.entity;
 
+import ru.elomonosov.datatype.Value;
+
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by n dd on 24.05.2015.
  */
-public interface Version {
+public final class Version {
 
-    public int getId();
+    private int id;
 
-    public Date getStartDate();
+    private Date startDate;
 
-    public Date getEndDate();
+    private Date endDate;
 
-    public Value getValue(Attribute attribute);
+    private Map<Attribute, Value> values;
 
-    public Record getRecord();
+    private Record record;
+
+    public int getId() {
+        return id;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return getEndDate();
+    }
+
+    public Value getValue(Attribute attribute) {
+        return values.get(attribute);
+    }
+
+    public Record getRecord() {
+        return record;
+    }
 }

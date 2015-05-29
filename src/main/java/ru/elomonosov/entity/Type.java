@@ -1,8 +1,10 @@
 package ru.elomonosov.entity;
 
-import ru.elomonosov.handler.AbstractAttributeHandler;
-import ru.elomonosov.handler.AbstractRecordHandler;
-import ru.elomonosov.handler.AbstractTypeHandler;
+import ru.elomonosov.configuration.Configuration;
+import ru.elomonosov.configuration.ConfigurationException;
+import ru.elomonosov.configuration.DefaultConfiguration;
+import ru.elomonosov.entytyhandler.TypeHandler;
+import ru.elomonosov.service.Jtm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,38 +13,48 @@ import java.util.Map;
 /**
  * Created by n dd on 24.05.2015.
  */
-public class Type {
+public final class Type {
 
-    private int id;
+    private final Jtm jtm;
 
-    private String name;
+    private final int id;
 
-    private Domain domain;
+    private final String name;
 
-    private List<Attribute> invariableAttributes;
+    private final Domain domain;
 
-    private List<Attribute> variableAttributes;
+    private final List<Attribute> invariableAttributes;
 
-    private Map<Attribute, Boolean> nullableAttributes;
+    private final List<Attribute> variableAttributes;
 
-    private Map<Attribute, Boolean> uniqueAttributes;
+    private final Map<Attribute, Boolean> nullableAttributes;
 
-    private Map<Attribute, Attribute> linksToAttribute;
+    private final Map<Attribute, Boolean> uniqueAttributes;
 
-    private AbstractTypeHandler typeHandler;
+    private final Map<Attribute, Attribute> linksToAttribute;
 
-    private AbstractRecordHandler recordHandler;
-
-    private Map<Attribute, AbstractAttributeHandler> attributeHandlers;
-
-    public AbstractTypeHandler getTypeHandler() {
-        return typeHandler;
+    public Type(Jtm jtm, int id, String name, Domain domain, List<Attribute> invariableAttributes, List<Attribute> variableAttributes,
+                Map<Attribute, Boolean> nullableAttributes, Map<Attribute, Boolean> uniqueAttributes, Map<Attribute, Attribute> linksToAttribute) {
+        this.jtm = jtm;
+        this.id = id;
+        this.name = name;
+        this.domain = domain;
+        this.invariableAttributes = invariableAttributes;
+        this.variableAttributes = variableAttributes;
+        this.nullableAttributes = nullableAttributes;
+        this.uniqueAttributes = uniqueAttributes;
+        this.linksToAttribute = linksToAttribute;
     }
 
-    public Domain getDomain() {
-        return domain;
+    public Jtm getJtm() {return jtm; }
+
+    public int getId() {return id; }
+
+    public String getName() {
+        return name;
     }
 
+    public Domain getDomain() { return domain; }
 
     List<Attribute> getInvariableAttributes() {
         return invariableAttributes;
@@ -59,61 +71,86 @@ public class Type {
         return result;
     }
 
-    public Map<Attribute, AbstractAttributeHandler> getAttributeHandlers(Type type) {
-        return null;
-    }
-
     public Attribute getLinkedAttribute(Attribute attribute) {
         return linksToAttribute.get(attribute);
     }
 
     public boolean isAttributeNullable(Attribute attribute) {
-       return  nullableAttributes.containsKey(attribute);
+        return nullableAttributes.containsKey(attribute);
     }
 
     public boolean isAttributeUnique(Attribute attribute) {
-        return  uniqueAttributes.containsKey(attribute);
+        return uniqueAttributes.containsKey(attribute);
     }
 
-    public List<Record> getRecords() {
-        return recordHandler.getRecords(); // TODO сделать вызов хэндлера
-    }
+    public static class Builder {
 
-    public List<Version> getAllVersions() {
-        List<Record> records = getRecords();
-        List<Version> result = new ArrayList<Version>();
+        private Jtm jtm;
 
-        for (Record record : records) {
-            result.addAll(record.getAllVersions());
+        private int id;
+
+        private String name;
+
+        private Domain domain;
+
+        private List<Attribute> invariableAttributes;
+
+        private List<Attribute> variableAttributes;
+
+        private Map<Attribute, Boolean> nullableAttributes;
+
+        private Map<Attribute, Boolean> uniqueAttributes;
+
+        private Map<Attribute, Attribute> linksToAttribute;
+
+        public Builder setJtm(Jtm jtm) {
+            this.jtm = jtm;
+            return this;
         }
-        return result;
-    }
 
-    public List<Version> findVersions(Attribute attribute, Value value) { // TODO переопределять при наследовании
-        List<Record> records = getRecords();
-        List<Version> result = new ArrayList<Version>();
-
-        for (Record record : records) {
-            List<Version> recordVersions = record.getAllVersions();
-            for (Version version : recordVersions) {
-                if (version.getValue(attribute) == value) {
-                    result.add(version);
-                }
-            }
+        public Builder setId(int id) {
+            this.id = id;
+            return this;
         }
-        return result;
-    }
 
-    public Version findVersion(int versionId) {
-        List<Record> records = getRecords();
-        for (Record record : records) {
-            List<Version> versions = record.getAllVersions();
-            for (Version version : versions) {
-                if (version.getId() == versionId) {
-                    return version;
-                }
-            }
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
         }
-        return null;
+
+        public Builder setDomain(Domain domain) {
+            this.domain = domain;
+            return this;
+        }
+
+        public Builder setInvariableAttributes(List<Attribute> invariableAttributes) {
+            this.invariableAttributes = invariableAttributes;
+            return this;
+        }
+
+        public Builder setVariableAttributes(List<Attribute> variableAttributes) {
+            this.variableAttributes = variableAttributes;
+            return this;
+        }
+
+        public Builder setNullableAttributes(Map<Attribute, Boolean> nullableAttributes) {
+            this.nullableAttributes = nullableAttributes;
+            return this;
+        }
+
+        public Builder setUniqueAttributes(Map<Attribute, Boolean> uniqueAttributes) {
+            this.uniqueAttributes = uniqueAttributes;
+            return this;
+        }
+
+        public Builder setLinksToAttribute(Map<Attribute, Attribute> linksToAttribute) {
+            this.linksToAttribute = linksToAttribute;
+            return this;
+        }
+
+        public Type build() {
+            return new Type(jtm, id, name, domain, invariableAttributes, variableAttributes, nullableAttributes, uniqueAttributes, linksToAttribute);
+        }
+
     }
 }
